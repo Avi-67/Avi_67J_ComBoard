@@ -61,7 +61,7 @@ void setup() {
 
 void loop() {
   //honbann code
-  while (Serial1.available())
+  if (Serial1.available())
   {
     char cmd = Serial1.read();
 
@@ -146,7 +146,7 @@ void loop() {
     }
   }
 
-while (Serial3.available())
+if (Serial3.available())
 {
   sign[0] = Serial3.read();
   switch (sign[0])
@@ -243,7 +243,7 @@ while (Serial3.available())
   }  
 }
   
-while (Serial4.available())
+if (Serial4.available())
 {
   sign[1] = Serial4.read();
   switch (sign[1])
@@ -290,7 +290,7 @@ while (Serial4.available())
   }
 }
 
-while (Serial5.available())
+if (Serial5.available())
 {
   sign[2] = Serial5.read();
 
