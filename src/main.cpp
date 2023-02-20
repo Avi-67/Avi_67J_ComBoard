@@ -70,7 +70,7 @@ void setup() {
   Serial1.begin(115200, SERIAL_8N1, RX1, TX1); //twelite
   Serial2.begin(115200, SERIAL_8N1, RX2, TX2);//GPS RX:17 TX:16
 
-  xSemaphore = xSemaphoreCreateMutex();//ミューテックス
+  xMutex = xSemaphoreCreateMutex();//ミューテックス
   xTaskCreatePinnedToCore(GPSTask, "GPSTask", 1000, NULL, 1, NULL, 0);//execute core 0
 
   pinMode(LED1, OUTPUT);
