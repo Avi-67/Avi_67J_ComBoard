@@ -4,53 +4,52 @@
 #include <SoftwareSerial.h>
 #include <67com_pin.h>
 
-#define DATASETSIZE 256
+TaskHandle_t task0;
 
-SoftwareSerial Serial3;
-SoftwareSerial Serial4;
-SoftwareSerial Serial5;
-SPICREATE::SPICreate SPIC;
-Flash flash1;
+void GPSTask(void *pvparamater){
+  for(;;){
+    char data[80];
+    for (int i = 0; i < 80; i++)
+    {
+      data[i] = 0;
+    }
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println("ESP launched");
-  Serial1.begin(115200, SERIAL_8N1, RX1, TX1); //twelite
-  Serial2.begin(115200, SERIAL_8N1, RX2, TX2);//GPS RX:17 TX:16
-  Serial3.begin(9600, SWSERIAL_8N1, RX3, TX3, false, 256);//para
-  Serial3.enableIntTx(false);
-  Serial4.begin(9600, SWSERIAL_8N1, RX4, TX4, false, 256);//log
-  Serial4.enableIntTx(false);
-  Serial5.begin(9600, SWSERIAL_8N1, RX5, TX5, false, 256);//LED
-  Serial5.enableIntTx(false);
+    int count = 0;
+    do
+    {
+      if (Serial2.available())
+      {
+        data[count] = Serial2.read();
+        count++;
+      }
+      if (count > 78)
+      {
+        break;
+      }
+    } while (data[count-1] != 0x0A); 
+
+    Serial1.print(data);
+  }
 }
 
+
+void setup() {
+  Serial1.begin(115200, SERIAL_8N1, RX1, TX1); //twelite
+  Serial2.begin(115200, SERIAL_8N1, RX2, TX2);//GPS RX:17 TX:16
+
+  xTaskCreatePinnedToCore(GPSTask, "GPSTask", 1000, NULL, 1, NULL, 0);//execute core 0
+
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(GPS_SW,OUTPUT);
+
+  digitalWrite(GPS_SW, HIGH);
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+  digitalWrite(LED3, HIGH);
+}
+
+
 void loop() {
-  if(Serial1.available()){
-    char cmd = Serial1.read();
-
-    Serial3.listen();
-    Serial3.print(cmd);
-    while(Serial3.available()){
-      char cmd3 = Serial3.read();
-      Serial1.write(cmd3);
-      Serial1.println(" from para");
-    }
-
-    Serial4.listen();
-    Serial4.print(cmd);
-    while(Serial4.available()){
-    char cmd4 = Serial4.read();
-    Serial1.write(cmd4);
-    Serial1.println(" from log");
-    }
-
-    Serial5.listen();
-    Serial5.print(cmd);
-    while(Serial5.available()){
-      char cmd5 = Serial5.read();
-      Serial1.write(cmd5);
-      Serial1.println(" from led");
-    }
-  }
-}   
+ }   
