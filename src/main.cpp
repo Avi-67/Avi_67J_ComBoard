@@ -6,29 +6,61 @@
 
 TaskHandle_t task0;
 
+int mode = 0;
+
+void commandtask(char cmd){
+  switch (cmd)
+  {
+  case 'p':
+    mode = 1;
+    digitalWrite(GPS_SW, HIGH);
+    Serial1.println("preparation mode");
+    break;
+  
+  case 's':
+    mode = 0;
+    Serial.println("stop mode");
+
+  case 'g':
+    digitalWrite(GPS_SW, LOW);
+    Serial.println("gps stopped");
+
+  default:
+    Serial1.println("wrong command");
+    break;
+  }
+}
+
 void GPSTask(void *pvparamater){
   for(;;){
-    char data[80];
-    for (int i = 0; i < 80; i++)
-    {
-      data[i] = 0;
+    while(Serial1.available()){
+      char cmd = Serial1.read();
+      commandtask(cmd);
     }
 
-    int count = 0;
-    do
-    {
-      if (Serial2.available())
+    while(mode = 1){
+      char data[80];
+      for (int i = 0; i < 80; i++)
       {
-        data[count] = Serial2.read();
-        count++;
+        data[i] = 0;
       }
-      if (count > 78)
-      {
-        break;
-      }
-    } while (data[count-1] != 0x0A); 
 
-    Serial1.print(data);
+      int count = 0;
+      do
+      {
+        if (Serial2.available())
+        {
+          data[count] = Serial2.read();
+          count++;
+        }
+        if (count > 78)
+        {
+          break;
+        }
+      } while (data[count-1] != 0x0A); 
+
+      Serial1.print(data);
+    }
   }
 }
 
@@ -44,7 +76,7 @@ void setup() {
   pinMode(LED3, OUTPUT);
   pinMode(GPS_SW,OUTPUT);
 
-  digitalWrite(GPS_SW, HIGH);
+  digitalWrite(GPS_SW, LOW);
   digitalWrite(LED1, LOW);
   digitalWrite(LED2, LOW);
   digitalWrite(LED3, HIGH);
