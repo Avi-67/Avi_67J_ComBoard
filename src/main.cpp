@@ -26,8 +26,9 @@ void setup() {
 }
 
 void loop() {
-  if(Serial1.available()){
+  while(Serial1.available()){
     char cmd = Serial1.read();
+    Serial1.println(cmd);
 
     Serial3.listen();
     Serial3.print(cmd);
