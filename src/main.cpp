@@ -7,7 +7,13 @@
 TaskHandle_t task0;
 SemaphoreHandle_t xMutex;
 
+SoftwareSerial Serial3;
+SoftwareSerial Serial4;
+SoftwareSerial Serial5;
+
 int mode = 0;
+int share_flag;
+char share_cmd;
 
 void commandtask(char cmd){
   switch (cmd)
@@ -65,13 +71,23 @@ void GPSTask(void *pvparamater){
   }
 }
 
+void btobTask(void *pvparamater){
+}
 
 void setup() {
   Serial1.begin(115200, SERIAL_8N1, RX1, TX1); //twelite
   Serial2.begin(115200, SERIAL_8N1, RX2, TX2);//GPS RX:17 TX:16
 
+  Serial3.begin(9600, SWSERIAL_8N1, RX3, TX3, false, 256);//para
+  Serial3.enableIntTx(false);
+  Serial4.begin(9600, SWSERIAL_8N1, RX4, TX4, false, 256);//log
+  Serial4.enableIntTx(false);
+  Serial5.begin(9600, SWSERIAL_8N1, RX5, TX5, false, 256);//LED
+  Serial5.enableIntTx(false);
+
   xMutex = xSemaphoreCreateMutex();//ミューテックス
-  xTaskCreatePinnedToCore(GPSTask, "GPSTask", 1000, NULL, 1, NULL, 0);//execute core 0
+  xTaskCreatePinnedToCore(GPSTask, "GPSTask", 8192, NULL, 1, NULL, 0);//execute core 0
+  xTaskCreatePinnedToCore(btobTask, "btobTask", 8192, NULL, 1, NULL, 0);
 
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
