@@ -87,7 +87,7 @@ void setup() {
 
   xMutex = xSemaphoreCreateMutex();//ミューテックス
   xTaskCreatePinnedToCore(GPSTask, "GPSTask", 8192, NULL, 1, NULL, 0);//execute core 0
-  xTaskCreatePinnedToCore(btobTask, "btobTask", 8192, NULL, 1, NULL, 0);
+  xTaskCreatePinnedToCore(btobTask, "btobTask", 8192, NULL, 1, NULL, 1);
 
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
